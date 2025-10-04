@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-configmap
+data:
+  listen_addr: ":8080"
+  catalog_base_url: "http://catalog:8001"
+  orders_base_url: "http://orders:8002"

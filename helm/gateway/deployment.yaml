@@ -2,20 +2,40 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gateway
-  labels:
-    app: gateway
-  spec:
-    replicas: 1
-    selector:
-      matchLabels:
-        app: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gateway
   template:
     metadata:
       labels:
-        app: gateway
-      spec:
-        containers:
-          - name: gateway
-            image: zarakprod/gateway:latest
-            ports:
-              - containerPort: 8080
+        app.kubernetes.io/name: gateway
+    spec:
+      containers:
+        - name: gateway-container
+          image: zarakprod/gateway:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: LISTEN_ADDR
+              valueFrom:
+                configMapKeyRef:
+                  name: gateway-configmap
+                  key: listen_addr
+            - name: CATALOG_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: gateway-configmap
+                  key: catalog_base_url
+            - name: ORDERS_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: gateway-configmap
+                  key: orders_base_url
+            - name: BASIC_USERS
+              valueFrom:
+                secretKeyRef:
+                  name: gateway-secret
+                  key: basic_users
+          terminationMessagePath: "/tmp/gateway-log"
