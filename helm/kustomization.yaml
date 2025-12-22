@@ -2,3 +2,4 @@ resources:
   - catalog/
   - gateway/
   - orders/
+  - templates/
