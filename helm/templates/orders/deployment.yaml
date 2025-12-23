@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+spec:
+  replicas: {{ .Values.orders.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: orders
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: orders
+    spec:
+      containers:
+        - name: orders-container
+          image: "{{ .Values.orders.image.repository }}:{{ .Values.orders.image.tag }}"
+          imagePullPolicy: {{ .Values.orders.image.pullPolicy }}
+          resources:
+            requests:
+              cpu: {{ .Values.orders.resources.requests.cpu }}
+              memory: {{ .Values.orders.resources.requests.memory }}
+          ports:
+            - name: orders-port
+              containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: orders-port
+            initialDelaySeconds: 10
+          env:
+            - name: LISTEN_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: orders-configmap
+                  key: listen_port
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: orders-configmap
+                  key: db_host
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: orders-configmap
+                  key: db_port
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: idvom-database-app
+                  key: dbname
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: idvom-database-app
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: idvom-database-app
+                  key: password
+            - name: DB_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: orders-configmap
+                  key: db_schema
+            - name: API_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: orders-configmap
+                  key: api_prefix
+          terminationMessagePath: "/tmp/orders-log"

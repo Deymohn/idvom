@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalog-configmap
+data:
+  listen_port: "8000"
+  db_host: "idvom-database-rw"
+  db_port: "5432"
+  db_schema: "catalog"
+  api_prefix: ""

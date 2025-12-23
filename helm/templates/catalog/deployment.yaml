@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+spec:
+  replicas: {{ .Values.catalog.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: catalog
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: catalog
+    spec:
+      containers:
+        - name: catalog-container
+          image: "{{ .Values.catalog.image.repository }}:{{ .Values.catalog.image.tag }}"
+          imagePullPolicy: {{ .Values.catalog.image.pullPolicy }}
+          resources:
+            requests:
+              cpu: {{ .Values.catalog.resources.requests.cpu }}
+              memory: {{ .Values.catalog.resources.requests.memory }}
+          ports:
+            - name: catalog-port
+              containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: catalog-port
+            initialDelaySeconds: 10
+          env:
+            - name: LISTEN_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: catalog-configmap
+                  key: listen_port
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: catalog-configmap
+                  key: db_host
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: catalog-configmap
+                  key: db_port
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: idvom-database-app
+                  key: dbname
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: idvom-database-app
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: idvom-database-app
+                  key: password
+            - name: DB_SCHEMA
+              valueFrom:
+                configMapKeyRef:
+                  name: catalog-configmap
+                  key: db_schema
+            - name: API_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: catalog-configmap
+                  key: api_prefix
+          terminationMessagePath: "/tmp/catalog-log"

@@ -1,0 +1,38 @@
+gateway:
+  replicas: 1
+  ingress:
+    enabled: true
+  image:
+    repository: "zarakprod/gateway"
+    tag: "latest"
+    pullPolicy: "Always"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+catalog:
+  replicas: 1
+  image:
+    repository: "zarakprod/catalog"
+    tag: "latest"
+    pullPolicy: "Always"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+
+orders:
+  replicas: 1
+  image:
+    repository: "zarakprod/orders"
+    tag: "latest"
+    pullPolicy: "Always"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+
+database:
+  storage:
+    size: "1Gi"
+  replicas: 2
