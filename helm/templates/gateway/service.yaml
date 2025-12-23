@@ -6,6 +6,7 @@ spec:
   selector:
     app.kubernetes.io/name: gateway
   ports:
-    - protocol: TCP
+    - name: gateway-sv-port
+      protocol: TCP
       port: 8000
-      targetPort: 8080
+      targetPort: gateway-port

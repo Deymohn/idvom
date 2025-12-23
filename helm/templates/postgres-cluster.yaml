@@ -3,6 +3,12 @@ kind: Cluster
 metadata:
   name: idvom-database
 spec:
-  instances: 2
+  instances: {{ .Values.database.replicas }}
   storage:
-    size: 1Gi
+    size: {{ .Values.database.storage.size }}
+  bootstrap:
+    initdb:
+      database: catalog
+      owner: appuser
+      postInitSQL:
+        - CREATE DATABASE orders OWNER appuser;
